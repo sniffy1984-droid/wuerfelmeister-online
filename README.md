@@ -1,22 +1,53 @@
-# Würfelmeister Online – Android-App-Projekt
+# Würfelmeister Online
 
-Dieses Projekt ist eine Android-WebView-App, die die Online-Spielseite in einer Android-App öffnet. Die Spielräume und Echtzeitkommunikation laufen weiterhin über den Webserver (Express + Socket.IO).
+Ein unkompliziertes Online-Würfelspiel im Kniffel-Stil. Private Räume mit Raumcode, 2–6 Spieler, Echtzeit-Synchronisierung per Socket.IO.
 
-## Wichtig: APK noch nicht fertig kompiliert
-In dieser Umgebung ist kein Android SDK/Gradle-Buildsystem verfügbar, daher kann hier keine installierbare APK zuverlässig gebaut werden. Dieses ZIP enthält das vollständige Android-Studio-Projekt zum Erzeugen der APK.
+## Lokal starten
 
-## APK erstellen
+Benötigt Node.js 18 oder neuer.
 
-1. Veröffentliche zuerst den Webserver aus dem separaten Projekt `wuerfelmeister-online.zip` (Anleitung dort).
-2. Kopiere die HTTPS-Adresse des veröffentlichten Spiels, zum Beispiel `https://dein-spiel.onrender.com`.
-3. Öffne `app/src/main/java/de/wuerfelmeister/online/MainActivity.java`.
-4. Ersetze `https://DEINE-SPIEL-URL-HIER` in `GAME_URL` durch deine echte HTTPS-Adresse.
-5. Öffne diesen Projektordner in Android Studio.
-6. Warte, bis Gradle synchronisiert ist, und wähle **Build → Build Bundle(s) / APK(s) → Build APK(s)**.
-7. Android Studio legt die APK üblicherweise unter `app/build/outputs/apk/debug/app-debug.apk` ab.
+```bash
+npm install
+npm start
+```
 
-## Testen
-- Die APK benötigt Internetzugriff.
-- Für Online-Partien muss die Spielserver-Adresse öffentlich erreichbar sein und HTTPS verwenden.
-- Die APK ist ein WebView-Wrapper, keine vollständig offlinefähige Version.
-- Vor einer Veröffentlichung im Play Store sollten App-Icon, Datenschutzangaben, Versionssignierung und Tests ergänzt werden.
+Dann `http://localhost:3000` öffnen. Für einen Test mit mehreren Spielern können mehrere Browserfenster geöffnet werden.
+
+## Einfach online veröffentlichen (Render)
+
+1. Erstelle ein GitHub-Konto, falls du noch keines hast.
+2. Lege ein neues Repository namens `wuerfelmeister-online` an.
+3. Lade `package.json`, `server.js`, `README.md` und den Ordner `public` in das Repository hoch.
+4. Melde dich bei [Render](https://render.com/) an und wähle **New + → Web Service**.
+5. Verbinde dein GitHub-Repository.
+6. Stelle ein:
+   - **Runtime:** Node
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Instance Type:** Free, falls für dein Konto verfügbar
+7. Klicke auf **Deploy Web Service**. Render zeigt dir eine HTTPS-Adresse, z. B. `https://dein-spiel.onrender.com`.
+8. Teile diese Adresse und den im Spiel angezeigten Raumcode mit deinen Freunden.
+
+Die genauen Bezeichnungen und kostenlosen Angebote können sich bei Render ändern. Auf kostenlosen Instanzen kann der erste Aufruf nach einer Ruhephase länger dauern.
+
+## Spielregeln
+
+- 2–6 Spieler, ein gemeinsamer privater Raum.
+- Der Gastgeber startet das Spiel, sobald mindestens zwei Personen verbunden sind.
+- Jeder Spieler wertet 13 Kategorien genau einmal.
+- Pro Zug bis zu drei Würfe; Würfel können zwischen Würfen behalten werden.
+- Oberer Block: Bonus von 35 Punkten ab 63 Punkten.
+- Der Server würfelt und berechnet die Punkte; der Client kann nicht einfach einen Punktwert an den Server senden.
+
+## Wichtige Grenzen dieses einfachen Prototyps
+
+- Spielräume und Punktestände liegen nur im Arbeitsspeicher des Servers. Bei Neustart/Schlafphase können sie verloren gehen.
+- Es gibt keine Anmeldung, keine Wiederaufnahme nach Verbindungsabbruch und keinen dauerhaften Spielverlauf.
+- Jeder Spieler sollte einen eigenen Tab/eine eigene Verbindung verwenden.
+- Keine Echtgeld- oder Glücksspiel-Funktion.
+
+## Technischer Aufbau
+
+- `server.js`: Express-Webserver, Socket.IO-Echtzeitkommunikation, Raumverwaltung, Würfel und Wertungslogik.
+- `public/index.html`: responsive Oberfläche ohne Build-Schritt oder zusätzliche Frontend-Tools.
+- `package.json`: Server-Abhängigkeiten und Startskript.
